@@ -225,6 +225,12 @@
             reader.readAsText(file);
         }
 
+        /**
+         * Parses the text content of a .spx or .nfo file to extract key hardware specs.
+         * This function now supports both English and French labels.
+         * @param {string} content - The file content as a single string.
+         * @returns {Object} An object containing the extracted specifications.
+         */
         function parseFileContent(content) {
             const specs = {
                 os: null,
@@ -233,26 +239,63 @@
                 gpu: null
             };
 
-            const osMatch = content.match(/OS Name:\s+(.*?)\n|Operating System:\s+(.*?)\n/);
+            // Regular expression for OS version (handles English and French)
+            const osMatch = content.match(/OS Name:\s+(.*?)\n|Operating System:\s+(.*?)\n|Nom du système d’exploitation:\s+(.*?)\n/);
             if (osMatch) {
-                specs.os = (osMatch[1] || osMatch[2] || '').trim();
+                specs.os = (osMatch[1] || osMatch[2] || osMatch[3] || '').trim();
             }
-            const cpuMatch = content.match(/Processor:\s+(.*?)\n|CPU:\s+(.*?)\n/);
+
+            // Regular expression for CPU (handles English and French)
+            const cpuMatch = content.match(/Processor:\s+(.*?)\n|CPU:\s+(.*?)\n|Processeur:\s+(.*?)\n/);
             if (cpuMatch) {
-                specs.cpu = (cpuMatch[1] || cpuMatch[2] || '').trim();
+                specs.cpu = (cpuMatch[1] || cpuMatch[2] || cpuMatch[3] || '').trim();
             }
-            const ramMatch = content.match(/Installed Physical Memory \(RAM\):\s+(.*?)\n|Memory:\s+(.*?)\n/);
+
+            // Regular expression for RAM (Installed Physical Memory, handles English and French)
+            const ramMatch = content.match(/Installed Physical Memory \(RAM\):\s+(.*?)\n|Memory:\s+(.*?)\n|Mémoire physique installée \(RAM\):\s+(.*?)\n/);
             if (ramMatch) {
-                specs.ram = (ramMatch[1] || ramMatch[2] || '').trim();
+                specs.ram = (ramMatch[1] || ramMatch[2] || ramMatch[3] || '').trim();
             }
-            const gpuMatch = content.match(/Name:\s+(.*?)\n/);
-            if (gpuMatch) {
-                specs.gpu = (gpuMatch[1] || '').trim();
+
+            // Regular expression for GPU (Name from Display section, handles English and French)
+            const gpuSectionMatch = content.match(/Composants d’affichage|Display Components\n([\s\S]*?)\n/);
+            if (gpuSectionMatch) {
+                const gpuSection = gpuSectionMatch[1];
+                const gpuMatch = gpuSection.match(/Nom:\s+(.*?)\n|Name:\s+(.*?)\n/);
+                if (gpuMatch) {
+                    specs.gpu = (gpuMatch[1] || gpuMatch[2] || '').trim();
+                }
             }
 
             return specs;
         }
 
+        // This is new, to handle form submission
+        specForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+
+            const formData = new FormData(specForm);
+
+            try {
+                const response = await fetch('/.netlify/functions/submit-specs', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    hideLoading();
+                    showMessage(result.message, 'success');
+                } else {
+                    throw new Error(result.message || 'Submission failed');
+                }
+            } catch (error) {
+                hideLoading();
+                showMessage(error.message, 'error');
+            }
+        });
     </script>
 </body>
 </html>
