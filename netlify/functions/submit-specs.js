@@ -55,7 +55,7 @@ exports.handler = async (event) => {
         // --- UPLOAD FILE TO GOOGLE DRIVE ---
         const fileMetadata = {
             name: uploadedFile.filename,
-            parents: ['YOUR_DRIVE_FOLDER_ID'], // REPLACE THIS WITH YOUR DRIVE FOLDER ID
+            parents: ['1FwFlUltNEGmG9r85PVR4vhaDy4NxJt9W'], // REPLACE THIS WITH YOUR DRIVE FOLDER ID
         };
         const media = {
             mimeType: 'text/plain',
