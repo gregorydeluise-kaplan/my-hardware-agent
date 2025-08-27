@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Hardware Specification Extractor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .file-upload-box {
+            border-style: dashed;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
+    <div class="bg-white shadow-xl rounded-2xl w-full max-w-2xl p-8">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">Hardware Spec Agent</h1>
+        <p class="text-center text-gray-600 mb-6">
+            Hi! I can help you find your computer's hardware specifications. Please follow these steps to upload your file.
+        </p>
+
+        <div class="space-y-4">
+            <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                <h2 class="text-lg font-semibold text-blue-800">Step 1: Generate the file</h2>
+                <p class="text-sm text-blue-700 mt-1">
+                    Press the Windows key + R, type `msinfo32` and press Enter. Once the System Information window opens, go to "File" > "Export..." and save the file with a `.spx` extension. Alternatively, you can search for `dxdiag` in the start menu and save all information as a `.nfo` file.
+                </p>
+            </div>
+            <div class="bg-green-50 p-4 rounded-xl border border-green-200">
+                <h2 class="text-lg font-semibold text-green-800">Step 2: Upload the file</h2>
+                <p class="text-sm text-green-700 mt-1">
+                    Drag and drop your `.spx` or `.nfo` file into the box below, or click to browse.
+                </p>
+            </div>
+        </div>
+        
+        <form name="hardware-spec-form" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data" id="spec-form" class="mt-6">
+            <div id="drop-area" class="flex justify-center items-center w-full h-48 bg-gray-50 border-2 file-upload-box border-gray-300 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors duration-200">
+                <div class="text-center text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-4-4v-1a4 4 0 014-4h14a4 4 0 014 4v1a4 4 0 01-4 4H7z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 12V4M9 9l3-3 3 3" />
+                    </svg>
+                    <span class="mt-2 block text-sm font-medium">Drag & Drop or Click to Upload</span>
+                    <span class="text-xs text-gray-400">.spx or .nfo files only</span>
+                </div>
+                <input type="file" id="file-input" name="file-input" class="hidden" accept=".spx, .nfo">
+            </div>
+
+            <div class="mt-6">
+                <label for="user-email" class="block text-sm font-medium text-gray-700">Your Email</label>
+                <input type="email" id="user-email" name="user-email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" required>
+            </div>
+            
+            <div class="mt-4">
+                <label for="user-prompt" class="block text-sm font-medium text-gray-700">Your Prompt (Optional)</label>
+                <textarea id="user-prompt" name="user-prompt" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"></textarea>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Submit
+                </button>
+            </div>
+
+            <input type="hidden" name="bot-field">
+        </form>
+        
+        <div id="loading" class="hidden text-center mt-6">
+            <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+                <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span>
+            </div>
+            <p class="text-sm text-gray-500 mt-2">Reading file...</p>
+        </div>
+        
+        <div id="message-box" class="hidden mt-6 p-4 rounded-xl" role="alert">
+            <p id="message-text" class="text-sm font-medium"></p>
+        </div>
+
+        <div id="results" class="hidden mt-6 space-y-4">
+            <h2 class="text-2xl font-semibold text-gray-800 text-center">Your System Specifications</h2>
+            
+            <div id="os-card" class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <p class="text-lg font-medium text-gray-700">Operating System:</p>
+                <p id="os-version" class="text-gray-900 font-bold text-xl mt-1"></p>
+            </div>
+
+            <div id="cpu-card" class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <p class="text-lg font-medium text-gray-700">CPU:</p>
+                <p id="cpu-name" class="text-gray-900 font-bold text-xl mt-1"></p>
+            </div>
+            
+            <div id="ram-card" class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <p class="text-lg font-medium text-gray-700">RAM:</p>
+                <p id="ram-size" class="text-gray-900 font-bold text-xl mt-1"></p>
+            </div>
+            
+            <div id="gpu-card" class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <p class="text-lg font-medium text-gray-700">GPU:</p>
+                <p id="gpu-name" class="text-gray-900 font-bold text-xl mt-1"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('file-input');
+        const loadingSpinner = document.getElementById('loading');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        const resultsDiv = document.getElementById('results');
+        const specForm = document.getElementById('spec-form');
+
+        // Functions to show/hide UI elements
+        const showMessage = (text, type = 'info') => {
+            messageText.textContent = text;
+            messageBox.className = `mt-6 p-4 rounded-xl ${
+                type === 'success' ? 'bg-green-100 text-green-700' :
+                type === 'error' ? 'bg-red-100 text-red-700' :
+                'bg-blue-100 text-blue-700'
+            }`;
+            messageBox.style.display = 'block';
+        };
+
+        const hideMessage = () => {
+            messageBox.style.display = 'none';
+        };
+
+        const showLoading = () => {
+            loadingSpinner.style.display = 'block';
+            dropArea.style.display = 'none';
+            resultsDiv.style.display = 'none';
+            hideMessage();
+        };
+
+        const hideLoading = () => {
+            loadingSpinner.style.display = 'none';
+        };
+
+        const showResults = (specs) => {
+            document.getElementById('os-version').textContent = specs.os || 'Not Found';
+            document.getElementById('cpu-name').textContent = specs.cpu || 'Not Found';
+            document.getElementById('ram-size').textContent = specs.ram || 'Not Found';
+            document.getElementById('gpu-name').textContent = specs.gpu || 'Not Found';
+            resultsDiv.style.display = 'block';
+        };
+
+        const hideResults = () => {
+            resultsDiv.style.display = 'none';
+            dropArea.style.display = 'flex';
+        };
+
+        // Event listeners for drag-and-drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.add('border-blue-500'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.remove('border-blue-500'), false);
+        });
+
+        dropArea.addEventListener('drop', handleDrop, false);
+        dropArea.addEventListener('click', () => fileInput.click(), false);
+        fileInput.addEventListener('change', handleFiles, false);
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles({ target: { files } });
+        }
+
+        function handleFiles(e) {
+            const files = e.target.files;
+            if (files.length === 0) {
+                showMessage('No file selected.', 'error');
+                return;
+            }
+            const file = files[0];
+            const reader = new FileReader();
+
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            if (fileExtension !== 'spx' && fileExtension !== 'nfo') {
+                showMessage('Invalid file type. Please upload a .spx or .nfo file.', 'error');
+                return;
+            }
+            
+            showLoading();
+
+            reader.onload = (event) => {
+                const content = event.target.result;
+                const specs = parseFileContent(content);
+                hideLoading();
+                if (specs.os || specs.cpu || specs.ram || specs.gpu) {
+                    showResults(specs);
+                    showMessage('Hardware specifications extracted successfully!', 'success');
+                } else {
+                    showMessage('Could not find hardware information in the file. Please ensure it is a valid System Information or DxDiag file.', 'error');
+                    hideResults();
+                }
+            };
+            
+            reader.onerror = (event) => {
+                hideLoading();
+                showMessage('Failed to read the file.', 'error');
+                console.error("File reading error: ", event.target.error);
+                hideResults();
+            };
+
+            reader.readAsText(file);
+        }
+
+        function parseFileContent(content) {
+            const specs = {
+                os: null,
+                cpu: null,
+                ram: null,
+                gpu: null
+            };
+
+            const osMatch = content.match(/OS Name:\s+(.*?)\n|Operating System:\s+(.*?)\n/);
+            if (osMatch) {
+                specs.os = (osMatch[1] || osMatch[2] || '').trim();
+            }
+            const cpuMatch = content.match(/Processor:\s+(.*?)\n|CPU:\s+(.*?)\n/);
+            if (cpuMatch) {
+                specs.cpu = (cpuMatch[1] || cpuMatch[2] || '').trim();
+            }
+            const ramMatch = content.match(/Installed Physical Memory \(RAM\):\s+(.*?)\n|Memory:\s+(.*?)\n/);
+            if (ramMatch) {
+                specs.ram = (ramMatch[1] || ramMatch[2] || '').trim();
+            }
+            const gpuMatch = content.match(/Name:\s+(.*?)\n/);
+            if (gpuMatch) {
+                specs.gpu = (gpuMatch[1] || '').trim();
+            }
+
+            return specs;
+        }
+
+    </script>
+</body>
+</html>
