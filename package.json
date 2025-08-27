@@ -1,16 +1,17 @@
 {
-  "dependencies": {
-    "busboy": "^1.6.0",
-    "googleapis": "^158.0.0"
-  },
   "name": "my-hardware-agent",
-  "description": "",
   "version": "1.0.0",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "busboy": "^1.6.0",
+    "googleapis": "^158.0.0"
+  }
+}
 }
