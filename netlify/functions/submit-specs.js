@@ -68,7 +68,7 @@ exports.handler = async (event) => {
         });
 
         // --- LOG DATA TO GOOGLE SHEETS ---
-        const sheetId = 'YOUR_GOOGLE_SHEET_ID'; // REPLACE THIS WITH YOUR GOOGLE SHEET ID
+        const sheetId = '1nkDs-ksnSVU3BQsKW7T6SHQIHIVJt3FQ0yMWEhVrtNw'; // REPLACE THIS WITH YOUR GOOGLE SHEET ID
         const sheetName = 'Sheet1';
         const values = [
             [new Date().toISOString(), userEmail, userPrompt, uploadedFile.filename],
