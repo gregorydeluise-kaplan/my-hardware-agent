@@ -10,7 +10,6 @@ exports.handler = async (event) => {
     }
 
     try {
-        // Use busboy to parse the multipart form data, including the file
         const bb = busboy({ headers: event.headers });
 
         const fields = {};
@@ -23,7 +22,7 @@ exports.handler = async (event) => {
                 file.on('end', () => {
                     fields[fieldname] = {
                         filename: filename.filename,
-                        content: Buffer.concat(chunks).toString('utf8'), // Assuming text content
+                        content: Buffer.concat(chunks).toString('utf8'),
                     };
                 });
             });
@@ -37,13 +36,21 @@ exports.handler = async (event) => {
 
         const formData = await fileUploadPromise;
 
-        // Extract data
-        const userEmail = formData['user-email'];
+        // Extract all the new form data
+        const firstName = formData['first-name'];
+        const lastName = formData['last-name'];
+        const city = formData['city'];
+        const state = formData['state'];
+        const email = formData['email'];
+        const os = formData['os'];
+        const internet = formData['internet'];
+        const networkCable = formData['network-cable'];
+        const accessModemRouter = formData['access-modem-router'];
+        const micWebcam = formData['mic-webcam'];
         const userPrompt = formData['user-prompt'];
         const uploadedFile = formData['file-input'];
 
         // --- GOOGLE API AUTHENTICATION ---
-        // You'll use your environment variable for credentials
         const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
         const auth = new google.auth.GoogleAuth({
             credentials,
@@ -55,7 +62,7 @@ exports.handler = async (event) => {
         // --- UPLOAD FILE TO GOOGLE DRIVE ---
         const fileMetadata = {
             name: uploadedFile.filename,
-            parents: ['1FwFlUltNEGmG9r85PVR4vhaDy4NxJt9W'], // REPLACE THIS WITH YOUR DRIVE FOLDER ID
+            parents: ['YOUR_DRIVE_FOLDER_ID'], 
         };
         const media = {
             mimeType: 'text/plain',
@@ -68,10 +75,23 @@ exports.handler = async (event) => {
         });
 
         // --- LOG DATA TO GOOGLE SHEETS ---
-        const sheetId = '1nkDs-ksnSVU3BQsKW7T6SHQIHIVJt3FQ0yMWEhVrtNw'; // REPLACE THIS WITH YOUR GOOGLE SHEET ID
+        const sheetId = 'YOUR_GOOGLE_SHEET_ID';
         const sheetName = 'Sheet1';
         const values = [
-            [new Date().toISOString(), userEmail, userPrompt, uploadedFile.filename],
+            [
+                new Date().toISOString(), 
+                firstName, 
+                lastName, 
+                city, 
+                state, 
+                os,
+                internet,
+                networkCable,
+                accessModemRouter,
+                micWebcam,
+                uploadedFile.filename,
+                userPrompt
+            ],
         ];
         const resource = { values };
         await sheets.spreadsheets.values.append({
@@ -81,7 +101,6 @@ exports.handler = async (event) => {
             resource,
         });
 
-        // Respond to the client
         return {
             statusCode: 200,
             body: JSON.stringify({ message: 'Data submitted successfully!' }),

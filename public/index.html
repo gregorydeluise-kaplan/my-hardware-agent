@@ -22,7 +22,7 @@
     <div class="bg-white shadow-xl rounded-2xl w-full max-w-2xl p-8">
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">Hardware Spec Agent</h1>
         <p class="text-center text-gray-600 mb-6">
-            Hi! I can help you find your computer's hardware specifications. Please follow these steps to upload your file.
+            Hi! I can help you find your computer's hardware specifications. Please fill out the form below.
         </p>
 
         <div class="space-y-4">
@@ -53,16 +53,81 @@
                 <input type="file" id="file-input" name="file-input" class="hidden" accept=".spx, .nfo">
             </div>
 
-            <div class="mt-6">
-                <label for="user-email" class="block text-sm font-medium text-gray-700">Your Email</label>
-                <input type="email" id="user-email" name="user-email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2" required>
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="first-name" class="block text-sm font-medium text-gray-700">First Name</label>
+                    <input type="text" id="first-name" name="first-name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2" required>
+                </div>
+                <div>
+                    <label for="last-name" class="block text-sm font-medium text-gray-700">Last Name</label>
+                    <input type="text" id="last-name" name="last-name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2" required>
+                </div>
             </div>
-            
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="city" class="block text-sm font-medium text-gray-700">City</label>
+                    <input type="text" id="city" name="city" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2" required>
+                </div>
+                <div>
+                    <label for="state" class="block text-sm font-medium text-gray-700">State</label>
+                    <input type="text" id="state" name="state" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2" required>
+                </div>
+            </div>
             <div class="mt-4">
-                <label for="user-prompt" class="block text-sm font-medium text-gray-700">Your Prompt (Optional)</label>
-                <textarea id="user-prompt" name="user-prompt" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"></textarea>
+                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" id="email" name="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2" required>
             </div>
-            
+            <div class="mt-4">
+                <label for="os" class="block text-sm font-medium text-gray-700">Operating System</label>
+                <input type="text" id="os" name="os" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2" required>
+            </div>
+            <div class="mt-4">
+                <label for="internet" class="block text-sm font-medium text-gray-700">How are you connected to the internet?</label>
+                <select id="internet" name="internet" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2" required>
+                    <option value="">Select a connection type</option>
+                    <option value="Cable">Cable</option>
+                    <option value="Satellite">Satellite</option>
+                    <option value="Mobile Hotspot">Mobile Hotspot</option>
+                    <option value="Fiber">Fiber</option>
+                </select>
+            </div>
+            <div class="mt-4">
+                <p class="text-sm font-medium text-gray-700">Do you connect to your modem or router via a network cable?</p>
+                <div class="mt-1 flex items-center space-x-4">
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="network-cable" value="Yes" class="form-radio" required>
+                        <span class="ml-2 text-gray-700">Yes</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="network-cable" value="No" class="form-radio">
+                        <span class="ml-2 text-gray-700">No</span>
+                    </label>
+                </div>
+            </div>
+            <div class="mt-4">
+                <p class="text-sm font-medium text-gray-700">Do you have access to your modem and router?</p>
+                <div class="mt-1 flex items-center space-x-4">
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="access-modem-router" value="Yes" class="form-radio" required>
+                        <span class="ml-2 text-gray-700">Yes</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="access-modem-router" value="No" class="form-radio">
+                        <span class="ml-2 text-gray-700">No</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <label for="mic-webcam" class="block text-sm font-medium text-gray-700">What kind of microphone and webcam are you using?  Is it all-in-one or different devices?  Are they external devices or internal parts of your computer?  What make and model number are they?  Please be as specific as possible.</label>
+                <textarea id="mic-webcam" name="mic-webcam" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2"></textarea>
+            </div>
+
+            <div class="mt-4">
+                <label for="user-prompt" class="block text-sm font-medium text-gray-700">Additional Notes (Optional)</label>
+                <textarea id="user-prompt" name="user-prompt" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2"></textarea>
+            </div>
+
             <div class="mt-6 text-center">
                 <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     Submit
@@ -274,6 +339,13 @@
         specForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading();
+
+            const file = fileInput.files[0];
+            if (!file) {
+                hideLoading();
+                showMessage('Please select a file to upload.', 'error');
+                return;
+            }
 
             const formData = new FormData(specForm);
 
