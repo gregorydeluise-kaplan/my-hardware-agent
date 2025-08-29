@@ -4,7 +4,6 @@ const { google } = require('googleapis');
 const busboy = require('busboy');
 
 exports.handler = async (event) => {
-    // Make sure this is a POST request
     if (event.httpMethod !== 'POST') {
         return { statusCode: 405, body: 'Method Not Allowed' };
     }
@@ -84,6 +83,7 @@ exports.handler = async (event) => {
                 lastName, 
                 city, 
                 state, 
+                email, 
                 os,
                 internet,
                 networkCable,
